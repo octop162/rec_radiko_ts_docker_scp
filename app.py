@@ -6,6 +6,7 @@ import xmltodict
 import json
 import logging
 import glob
+import datetime
 
 # Environment Variables
 STATION_NAME = os.environ['STATION_NAME']
@@ -14,7 +15,8 @@ HOST = os.environ['HOST']
 PORT = os.environ['PORT']
 USER = os.environ['USER']
 DIRNAME = os.environ['DIRNAME']
-TIME_TABLE = os.environ['TIME_TABLE'] #'https://radiko.jp/v3/program/today/JP13.xml'
+PREFECTURE = os.environ['PREFECTURE'] #'JP13'
+YESTERDAY = os.environ['YESTERDAY'] #'TRUE' | 'FALSE'
 SLACK_WEBHOOK = os.environ['SLACK_WEBHOOK']
 
 # Constant
@@ -33,7 +35,14 @@ logger.info('START')
 
 # Get Program
 logger.info('GET PROGRAM')
-request = urllib.request.Request(TIME_TABLE)
+time_table = 'http://radiko.jp/v3/program/today/{PREFECTURE}.xml'
+if YESTERDAY == 'TRUE':
+    now = datetime.datetime.now()
+    yesterday = now - datetime.timedelta(days=1)
+    t = now.strftime('%Y%m%d')
+    time_table = f'http://radiko.jp/v3/program/date/{t}/{PREFECTURE}.xml'
+logger.info(time_table)
+request = urllib.request.Request(time_table)
 with urllib.request.urlopen(request) as response:
     xml = response.read()
     parsed_xml = xmltodict.parse(xml)
@@ -74,7 +83,7 @@ os.system(command_scp)
 # Post Slack urllib
 if SLACK_WEBHOOK:
     logger.info('POST SLACK')
-    slack_data = {'text': f"{filename}.mp3をアップロードしました"}
+    slack_data = {'text': f"{filename}.mp3をアップロードしました\n{PROGRAM_TITLE}"}
     request = urllib.request.Request(SLACK_WEBHOOK, json.dumps(slack_data).encode('utf-8'))
     with urllib.request.urlopen(request) as response:
         response_body = response.read().decode('utf-8')
