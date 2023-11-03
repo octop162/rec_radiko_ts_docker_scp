@@ -35,7 +35,7 @@ logger.info('START')
 
 # Get Program
 logger.info('GET PROGRAM')
-time_table = 'http://radiko.jp/v3/program/today/{PREFECTURE}.xml'
+time_table = f'http://radiko.jp/v3/program/today/{PREFECTURE}.xml'
 if YESTERDAY == 'TRUE':
     now = datetime.datetime.now()
     yesterday = now - datetime.timedelta(days=1)
