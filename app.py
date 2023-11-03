@@ -15,6 +15,7 @@ PORT = os.environ['PORT']
 USER = os.environ['USER']
 DIRNAME = os.environ['DIRNAME']
 TIME_TABLE = os.environ['TIME_TABLE'] #'https://radiko.jp/v3/program/today/JP13.xml'
+SLACK_WEBHOOK = os.environ['SLACK_WEBHOOK']
 
 # Constant
 SHELL = './rec_radiko_ts.sh'
@@ -69,6 +70,15 @@ os.system(command_mkdir)
 command_scp = f'sshpass -e scp -o StrictHostKeyChecking=no -P {PORT} {filename}.mp3 {USER}@{HOST}:{DIRNAME}/'
 logger.info(command_scp)
 os.system(command_scp)
+
+# Post Slack urllib
+if SLACK_WEBHOOK:
+    logger.info('POST SLACK')
+    slack_data = {'text': 'Hello, World!'}
+    request = urllib.request.Request(SLACK_WEBHOOK, json.dumps(slack_data).encode('utf-8'))
+    with urllib.request.urlopen(request) as response:
+        response_body = response.read().decode('utf-8')
+        logger.info(response_body)
 
 # End
 logger.info('END')
