@@ -74,7 +74,7 @@ os.system(command_scp)
 # Post Slack urllib
 if SLACK_WEBHOOK:
     logger.info('POST SLACK')
-    slack_data = {'text': 'Hello, World!'}
+    slack_data = {'text': f"{filename}.mp3をアップロードしました}"}
     request = urllib.request.Request(SLACK_WEBHOOK, json.dumps(slack_data).encode('utf-8'))
     with urllib.request.urlopen(request) as response:
         response_body = response.read().decode('utf-8')
